@@ -13,7 +13,10 @@ public class Sudoku
     public Sudoku()
     {
         Difficulty = PickDifficulty();
+
         Console.Clear();
+        Console.CursorVisible = false;
+
         Board = new Cell[9, 9];
         for (int row = 0; row < 9; row++)
         {
@@ -27,40 +30,51 @@ public class Sudoku
 
         while (true)
         {
-
             Console.SetCursorPosition(0,0);
             DisplayBoard(Board);
-            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+            DrawCursorOverlay();
+            GetPlayerInput();
+        }
+    }
 
-            if (keyInfo.KeyChar >= '1' && keyInfo.KeyChar <= '9')
+    private void GetPlayerInput()
+    {
+        ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+
+        if (keyInfo.KeyChar >= '1' && keyInfo.KeyChar <= '9')
+        {
+            if (!Board[CursorRow, CursorColumn].IsGiven)
             {
-                if (!Board[CursorRow, CursorColumn].IsGiven)
-                    Board[CursorRow, CursorColumn].Value = keyInfo.KeyChar - '0';
+                Board[CursorRow, CursorColumn].IsGuess = true;
+                Board[CursorRow, CursorColumn].Value = keyInfo.KeyChar - '0';
             }
-            else if (keyInfo.KeyChar == '0' || keyInfo.Key == ConsoleKey.Backspace || keyInfo.Key == ConsoleKey.Delete)
+        }
+        else if (keyInfo.KeyChar == '0' || keyInfo.Key == ConsoleKey.Backspace || keyInfo.Key == ConsoleKey.Delete)
+        {
+            if (!Board[CursorRow, CursorColumn].IsGiven)
             {
-                if (!Board[CursorRow, CursorColumn].IsGiven)
-                    Board[CursorRow, CursorColumn].Value = 0;
+                Board[CursorRow, CursorColumn].IsGuess = false;
+                Board[CursorRow, CursorColumn].Value = 0;
             }
-            else
+        }
+        else
+        {
+            switch (keyInfo.Key)
             {
-                switch (keyInfo.Key)
-                {
-                    case ConsoleKey.UpArrow:
-                        if (CursorRow > 0) CursorRow--;
-                        break;
-                    case ConsoleKey.DownArrow:
-                        if (CursorRow < 8) CursorRow++;
-                        break;
-                    case ConsoleKey.LeftArrow:
-                        if (CursorColumn > 0) CursorColumn--;
-                        break;
-                    case ConsoleKey.RightArrow:
-                        if (CursorColumn < 8) CursorColumn++;
-                        break;
-                    case ConsoleKey.Escape:
-                        return;
-                }
+                case ConsoleKey.UpArrow:
+                    if (CursorRow > 0) CursorRow--;
+                    break;
+                case ConsoleKey.DownArrow:
+                    if (CursorRow < 8) CursorRow++;
+                    break;
+                case ConsoleKey.LeftArrow:
+                    if (CursorColumn > 0) CursorColumn--;
+                    break;
+                case ConsoleKey.RightArrow:
+                    if (CursorColumn < 8) CursorColumn++;
+                    break;
+                case ConsoleKey.Escape:
+                    return;
             }
         }
     }
@@ -105,6 +119,7 @@ public class Sudoku
                             board[row, column].Value = value;
                             if (Solve(board))
                                 return true;
+
                             board[row, column].Value = 0;
                         }
                     }
@@ -148,24 +163,48 @@ public class Sudoku
                 else
                     Console.Write("│");
 
-                if (i == CursorRow && j == CursorColumn)
-                {
-                    Console.BackgroundColor = ConsoleColor.White;
-                    Console.ForegroundColor = ConsoleColor.Black;
-                }
-
                 if (board[i, j].IsGiven)
                     Console.Write($" {board[i, j].ToString()} ");
+                else if (board[i, j].IsGuess)
+                {
+                    Console.ForegroundColor= ConsoleColor.Cyan;
+                    Console.Write($" {board[i, j].ToString()} ");
+                    Console.ResetColor();
+                }
                 else
                     Console.Write("   ");
-
-                Console.ResetColor();
             }
 
             Console.WriteLine("║");
         }
 
         Console.WriteLine("╚═══╧═══╧═══╩═══╧═══╧═══╩═══╧═══╧═══╝");
+    }
+
+    private void DrawCursorOverlay()
+    {
+        // Calcula as posições absolutas na tela
+        int x = CursorColumn * 4;
+        int y = CursorRow * 2;
+
+        Console.ForegroundColor = ConsoleColor.Red; // Escolha a cor do seu cursor
+
+        // Desenha o teto da célula
+        Console.SetCursorPosition(x, y);
+        Console.Write("╔═══╗");
+
+        // Desenha as paredes laterais (y + 1 é a linha do número)
+        Console.SetCursorPosition(x, y + 1);
+        Console.Write("║"); // Parede esquerda
+
+        Console.SetCursorPosition(x + 4, y + 1);
+        Console.Write("║"); // Parede direita
+
+        // Desenha o chão da célula (y + 2 é a linha divisória de baixo)
+        Console.SetCursorPosition(x, y + 2);
+        Console.Write("╚═══╝");
+
+        Console.ResetColor(); // Muito importante para não deixar o terminal vermelho
     }
 }
 
@@ -181,6 +220,8 @@ public class Cell
 {
     public int Value { get; set; } = 0;
     public bool IsGiven { get; set; }
+    public bool IsGuess { get; set; }
+
     public Cell(Difficulty difficulty)
     {
         IsGiven = RollTheDice(difficulty);
