@@ -1,0 +1,14 @@
+E:\repos\SudokuCLI\bin\Debug\net9.0\SudokuCLI.exe
+E:\repos\SudokuCLI\bin\Debug\net9.0\SudokuCLI.deps.json
+E:\repos\SudokuCLI\bin\Debug\net9.0\SudokuCLI.runtimeconfig.json
+E:\repos\SudokuCLI\bin\Debug\net9.0\SudokuCLI.dll
+E:\repos\SudokuCLI\bin\Debug\net9.0\SudokuCLI.pdb
+E:\repos\SudokuCLI\obj\Debug\net9.0\SudokuCLI.GeneratedMSBuildEditorConfig.editorconfig
+E:\repos\SudokuCLI\obj\Debug\net9.0\SudokuCLI.AssemblyInfoInputs.cache
+E:\repos\SudokuCLI\obj\Debug\net9.0\SudokuCLI.AssemblyInfo.cs
+E:\repos\SudokuCLI\obj\Debug\net9.0\SudokuCLI.csproj.CoreCompileInputs.cache
+E:\repos\SudokuCLI\obj\Debug\net9.0\SudokuCLI.dll
+E:\repos\SudokuCLI\obj\Debug\net9.0\refint\SudokuCLI.dll
+E:\repos\SudokuCLI\obj\Debug\net9.0\SudokuCLI.pdb
+E:\repos\SudokuCLI\obj\Debug\net9.0\SudokuCLI.genruntimeconfig.cache
+E:\repos\SudokuCLI\obj\Debug\net9.0\ref\SudokuCLI.dll
