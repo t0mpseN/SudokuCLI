@@ -28,13 +28,30 @@ public class Sudoku
 
         Solve(Board);
 
-        while (true)
+        bool haveWon = false;
+        while (!haveWon)
         {
             Console.SetCursorPosition(0,0);
             DisplayBoard(Board);
             DrawCursorOverlay();
             GetPlayerInput();
+            haveWon = ValidateWin();
         }
+    }
+
+    private bool ValidateWin()
+    {
+        List<Cell> correctCells = new List<Cell>();
+        foreach (Cell cell in Board)
+        {
+            if (cell.Value == cell.Guess)
+                correctCells.Add(cell);
+        }
+
+        if (correctCells.Count == Board.Length)
+            return true;
+
+        return false;
     }
 
     private void GetPlayerInput()
@@ -46,7 +63,7 @@ public class Sudoku
             if (!Board[CursorRow, CursorColumn].IsGiven)
             {
                 Board[CursorRow, CursorColumn].IsGuess = true;
-                Board[CursorRow, CursorColumn].Value = keyInfo.KeyChar - '0';
+                Board[CursorRow, CursorColumn].Guess = keyInfo.KeyChar - '0';
             }
         }
         else if (keyInfo.KeyChar == '0' || keyInfo.Key == ConsoleKey.Backspace || keyInfo.Key == ConsoleKey.Delete)
@@ -54,7 +71,7 @@ public class Sudoku
             if (!Board[CursorRow, CursorColumn].IsGiven)
             {
                 Board[CursorRow, CursorColumn].IsGuess = false;
-                Board[CursorRow, CursorColumn].Value = 0;
+                Board[CursorRow, CursorColumn].Guess = 0;
             }
         }
         else
@@ -183,28 +200,24 @@ public class Sudoku
 
     private void DrawCursorOverlay()
     {
-        // Calcula as posições absolutas na tela
         int x = CursorColumn * 4;
         int y = CursorRow * 2;
 
-        Console.ForegroundColor = ConsoleColor.Red; // Escolha a cor do seu cursor
+        Console.ForegroundColor = ConsoleColor.Red;
 
-        // Desenha o teto da célula
         Console.SetCursorPosition(x, y);
         Console.Write("╔═══╗");
 
-        // Desenha as paredes laterais (y + 1 é a linha do número)
         Console.SetCursorPosition(x, y + 1);
-        Console.Write("║"); // Parede esquerda
+        Console.Write("║"); 
 
         Console.SetCursorPosition(x + 4, y + 1);
-        Console.Write("║"); // Parede direita
+        Console.Write("║");
 
-        // Desenha o chão da célula (y + 2 é a linha divisória de baixo)
         Console.SetCursorPosition(x, y + 2);
         Console.Write("╚═══╝");
 
-        Console.ResetColor(); // Muito importante para não deixar o terminal vermelho
+        Console.ResetColor(); 
     }
 }
 
@@ -219,6 +232,7 @@ public enum Difficulty
 public class Cell
 {
     public int Value { get; set; } = 0;
+    public int Guess { get; set; }
     public bool IsGiven { get; set; }
     public bool IsGuess { get; set; }
 
