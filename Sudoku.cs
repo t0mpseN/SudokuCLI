@@ -5,6 +5,8 @@ public class Sudoku
     // PROPERTIES ==========
     public Cell[,] Board { get; set; }
     public Difficulty Difficulty { get; set; } = Difficulty.Easy;
+    public int CursorRow { get; set; }
+    public int CursorColumn { get; set; }
 
 
     // CONSTRUCTOR ==========
@@ -22,17 +24,55 @@ public class Sudoku
         }
 
         Solve(Board);
-        DisplayBoard(Board);
-    }
 
+        while (true)
+        {
+
+            Console.SetCursorPosition(0,0);
+            DisplayBoard(Board);
+            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+
+            if (keyInfo.KeyChar >= '1' && keyInfo.KeyChar <= '9')
+            {
+                if (!Board[CursorRow, CursorColumn].IsGiven)
+                    Board[CursorRow, CursorColumn].Value = keyInfo.KeyChar - '0';
+            }
+            else if (keyInfo.KeyChar == '0' || keyInfo.Key == ConsoleKey.Backspace || keyInfo.Key == ConsoleKey.Delete)
+            {
+                if (!Board[CursorRow, CursorColumn].IsGiven)
+                    Board[CursorRow, CursorColumn].Value = 0;
+            }
+            else
+            {
+                switch (keyInfo.Key)
+                {
+                    case ConsoleKey.UpArrow:
+                        if (CursorRow > 0) CursorRow--;
+                        break;
+                    case ConsoleKey.DownArrow:
+                        if (CursorRow < 8) CursorRow++;
+                        break;
+                    case ConsoleKey.LeftArrow:
+                        if (CursorColumn > 0) CursorColumn--;
+                        break;
+                    case ConsoleKey.RightArrow:
+                        if (CursorColumn < 8) CursorColumn++;
+                        break;
+                    case ConsoleKey.Escape:
+                        return;
+                }
+            }
+        }
+    }
 
 
     // METHODS ==========
     private Difficulty PickDifficulty()
     {
         Console.Write("Pick difficulty:\n1. Easy\n2. Medium\n3. Hard\n4. Expert\n");
-        ConsoleKeyInfo key = Console.ReadKey();
-        switch (key.KeyChar)
+        ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+
+        switch (keyInfo.KeyChar)
         {
             case '1':
                 return Difficulty.Easy;
@@ -90,17 +130,42 @@ public class Sudoku
 
     private void DisplayBoard(Cell[,] board)
     {
+        Console.WriteLine("╔═══╤═══╤═══╦═══╤═══╤═══╦═══╤═══╤═══╗");
         for (int i = 0; i < 9; i++)
         {
+            if (i > 0)
+            {
+                if (i % 3 == 0)
+                    Console.WriteLine("╠═══╪═══╪═══╬═══╪═══╪═══╬═══╪═══╪═══╣");
+                else
+                    Console.WriteLine("╟───┼───┼───╫───┼───┼───╫───┼───┼───╢");
+            }
+
             for (int j = 0; j < 9; j++)
             {
-                if (board[i, j].IsGiven)
-                    Console.Write(board[i, j].ToString() + " ");
+                if (j % 3 == 0)
+                    Console.Write("║");
                 else
-                    Console.Write("  ");
+                    Console.Write("│");
+
+                if (i == CursorRow && j == CursorColumn)
+                {
+                    Console.BackgroundColor = ConsoleColor.White;
+                    Console.ForegroundColor = ConsoleColor.Black;
+                }
+
+                if (board[i, j].IsGiven)
+                    Console.Write($" {board[i, j].ToString()} ");
+                else
+                    Console.Write("   ");
+
+                Console.ResetColor();
             }
-            Console.WriteLine();
+
+            Console.WriteLine("║");
         }
+
+        Console.WriteLine("╚═══╧═══╧═══╩═══╧═══╧═══╩═══╧═══╧═══╝");
     }
 }
 
@@ -118,7 +183,6 @@ public class Cell
     public bool IsGiven { get; set; }
     public Cell(Difficulty difficulty)
     {
-        // TODO: adicionar dificuldade
         IsGiven = RollTheDice(difficulty);
     }
 
