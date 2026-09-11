@@ -1,4 +1,6 @@
-﻿namespace SudokuCLI;
+﻿using System.Diagnostics;
+
+namespace SudokuCLI;
 
 public class Sudoku
 {
@@ -28,6 +30,7 @@ public class Sudoku
 
         Solve(Board);
 
+        Stopwatch stopwatch = Stopwatch.StartNew();
         bool haveWon = false;
         while (!haveWon)
         {
@@ -37,18 +40,30 @@ public class Sudoku
             GetPlayerInput();
             haveWon = ValidateWin();
         }
+
+        double timeElapsed = stopwatch.Elapsed.TotalMinutes;
+        if (DisplayEndScreen(timeElapsed))
+            new Sudoku();
+        else
+            Environment.Exit(0);
     }
 
+
+    // METHODS ==========
     private bool ValidateWin()
     {
         List<Cell> correctCells = new List<Cell>();
+        int givenCount = 0;
         foreach (Cell cell in Board)
         {
             if (cell.Value == cell.Guess)
                 correctCells.Add(cell);
+
+            if (cell.IsGiven)
+                givenCount++;
         }
 
-        if (correctCells.Count == Board.Length)
+        if (correctCells.Count == Board.Length - givenCount)
             return true;
 
         return false;
@@ -57,7 +72,6 @@ public class Sudoku
     private void GetPlayerInput()
     {
         ConsoleKeyInfo keyInfo = Console.ReadKey(true);
-
         if (keyInfo.KeyChar >= '1' && keyInfo.KeyChar <= '9')
         {
             if (!Board[CursorRow, CursorColumn].IsGiven)
@@ -96,10 +110,9 @@ public class Sudoku
         }
     }
 
-
-    // METHODS ==========
     private Difficulty PickDifficulty()
     {
+        Console.Clear();
         Console.Write("Pick difficulty:\n1. Easy\n2. Medium\n3. Hard\n4. Expert\n");
         ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
@@ -114,8 +127,28 @@ public class Sudoku
             case '4':
                 return Difficulty.Expert;
             default:
-                Console.WriteLine("\nInvalid option. Setting difficulty to Easy.");
+                PickDifficulty();
                 return Difficulty.Easy;
+        }
+    }
+
+    private bool DisplayEndScreen(double timeElapsed)
+    {
+        Console.Clear();
+        Console.WriteLine("CONGRATULATIONS!");
+        Console.WriteLine($"You have solved this board in {timeElapsed:F2}");
+        Console.WriteLine("Play again?\n1. Yes\n2.");
+
+        ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+        switch (keyInfo.KeyChar)
+        {
+            case '1':
+                return true;
+            case '2':
+                return false;
+            default:
+                DisplayEndScreen(timeElapsed);
+                return false;
         }
     }
 
@@ -262,7 +295,10 @@ public class Cell
 
     public override string ToString()
     {
-        return Value.ToString();
+        if (IsGiven)
+            return Value.ToString();
+        else
+            return Guess.ToString();
         //┌───┐
         //│ X │
         //└───┘
