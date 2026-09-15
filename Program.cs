@@ -4,8 +4,10 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        Console.WriteLine("Welcome to SudokuCLI!");
+        Terminal.Setup();
 
-        Sudoku sudoku = new Sudoku();
+        Navigation.MainMenu();
+
+        //Game sudoku = new Game();
     }
 }
