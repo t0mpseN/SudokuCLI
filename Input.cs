@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace SudokuCLI;
+﻿namespace SudokuCLI;
 
 public static class Input
 {
